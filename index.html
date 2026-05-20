@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Grade 6 Vocab Quiz 2026</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #f6f7fb;
+    color: #1f2937;
+    line-height: 1.5;
+  }
+  header {
+    background: linear-gradient(135deg, #0891b2, #0e7490);
+    color: white;
+    padding: 20px 24px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 14px rgba(8,145,178,.25);
+  }
+  header h1 { margin: 0 0 6px 0; font-size: 26px; }
+  header p { margin: 0; opacity: .9; font-size: 14px; }
+  .scorebar {
+    position: sticky;
+    top: 8px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    z-index: 10;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .scorebar .stats { font-weight: 600; }
+  .scorebar .stats span.correct { color: #059669; }
+  .scorebar .stats span.wrong { color: #dc2626; }
+  .scorebar button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .scorebar button:hover { background: #dc2626; }
+  .question {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .question .qtext { font-weight: 600; margin-bottom: 12px; font-size: 16px; }
+  .question .qnum { color: #0891b2; margin-right: 6px; }
+  .options { display: grid; gap: 8px; }
+  .opt {
+    text-align: left;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: inherit;
+    color: #1f2937;
+    transition: all .15s ease;
+  }
+  .opt:hover:not(:disabled) {
+    background: #ecfeff;
+    border-color: #67e8f9;
+  }
+  .opt:disabled { cursor: default; }
+  .opt .letter {
+    display: inline-block;
+    width: 24px; height: 24px; line-height: 24px;
+    text-align: center;
+    background: #0891b2;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    margin-right: 10px;
+    font-size: 13px;
+  }
+  .opt.correct { background: #d1fae5; border-color: #10b981; color: #065f46; }
+  .opt.correct .letter { background: #10b981; }
+  .opt.incorrect { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+  .opt.incorrect .letter { background: #ef4444; }
+  .feedback {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.right { background: #ecfdf5; color: #065f46; }
+  .feedback.wrong { background: #fef2f2; color: #991b1b; }
+  footer { text-align: center; margin: 30px 0 10px; color: #6b7280; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Grade 6 Vocab Quiz 2026</h1>
+  <p>Click an answer to check it. Green = correct, red = incorrect.</p>
+</header>
+
+<div class="scorebar">
+  <div class="stats">
+    Score: <span class="correct" id="correctCount">0</span> correct ·
+    <span class="wrong" id="wrongCount">0</span> wrong ·
+    <span id="answered">0</span> / <span id="total">0</span> answered
+  </div>
+  <button onclick="resetQuiz()">Reset Quiz</button>
+</div>
+
+<div id="quiz"></div>
+
+<footer>End of quiz — nice work!</footer>
+
+<script>
+const QUESTIONS = [
+  {q:"What does \"primly\" mean?", o:["In a stiff, formal, and proper way","In a sloppy and careless way","In a loud and excited way","In a fast and reckless way"], a:0},
+  {q:"What does \"matronly\" mean?", o:["Young and adventurous","Like a dignified, older married woman","Tall and thin","Very loud and outgoing"], a:1},
+  {q:"What does \"lapses\" (plural noun) mean?", o:["Small failures, slips, or breaks in attention","Loud bursts of music","Long winning streaks","Sharp pieces of glass"], a:0},
+  {q:"What does \"institution\" mean?", o:["A small private home","An established organization (like a school, hospital, or bank)","A type of festival","A short break from work"], a:1},
+  {q:"What does \"rubbers\" mean (in old-fashioned use)?", o:["Loud noise-making toys","Soft erasers","Rubber overshoes worn in wet weather","Bouncy balls"], a:2},
+  {q:"What does \"maneuvered\" mean?", o:["Sat completely still","Moved skillfully and carefully into position","Sang very loudly","Forgot something important"], a:1},
+  {q:"What does \"haggard\" mean?", o:["Looking exhausted, worn, or unwell","Glowing and energetic","Tall and graceful","Brightly colored"], a:0},
+  {q:"What does \"awed\" mean?", o:["Bored and uninterested","Angry and confused","Filled with wonder and respect","Quickly running away"], a:2},
+  {q:"What does \"grimly\" mean?", o:["In a cheerful, happy manner","In a serious, stern, gloomy manner","In a quiet whisper","At a very high speed"], a:1},
+  {q:"What does \"squatted\" mean?", o:["Crouched down close to the ground","Stood up very tall","Sprinted forward","Sang a soft song"], a:0},
+  {q:"What does \"raucous\" mean?", o:["Soft and gentle","Quiet and shy","Loud, harsh, and rowdy","Smooth and elegant"], a:2},
+  {q:"What does \"pounding\" mean?", o:["Touching gently","Striking heavily and repeatedly","Folding neatly","Drawing carefully"], a:1},
+  {q:"What does \"renounced\" mean?", o:["Strongly held onto something","Formally gave up or rejected something","Decorated brightly","Watched silently"], a:1},
+  {q:"What does \"incredulously\" mean?", o:["In a way that shows disbelief or doubt","With strong, confident agreement","In a happy, cheerful tone","With careful precision"], a:0},
+  {q:"What does \"solemnly\" mean?", o:["In a silly and playful way","In a very serious, formal manner","Very quickly","Extremely loudly"], a:1},
+  {q:"What does \"insolently\" mean?", o:["In a rude, disrespectful way","In a polite, friendly way","Very quietly","With great patience"], a:0},
+  {q:"What does \"deprived\" mean?", o:["Given everything one needs","Kept from having something needed or wanted","Loudly cheered for","Carefully measured"], a:1},
+  {q:"What does \"swaggering\" mean?", o:["Walking proudly or arrogantly","Sitting very still","Whispering softly","Running away in fear"], a:0},
+  {q:"What does \"occasional\" mean?", o:["Happening sometimes, not regularly","Happening every minute","Never happening","Happening only at night"], a:0},
+  {q:"What does \"parsimony\" mean?", o:["Being generous and giving freely","Being very careful with money; reluctance to spend","A type of music","A loud celebration"], a:1},
+  {q:"What does \"grocer\" mean?", o:["A type of lawyer","A person who sells food like fruits and vegetables","A school principal","A fast runner"], a:1},
+  {q:"What does \"instigate\" mean?", o:["To start something, especially trouble or an argument","To politely apologize","To stop a fight","To run quickly"], a:0},
+  {q:"What does \"imputation\" mean?", o:["A friendly compliment","Blaming someone, often without proof","A type of math problem","A warm meal"], a:1},
+  {q:"What does \"predominating\" mean?", o:["Being the strongest or most noticeable thing","Being the smallest, hidden thing","Moving very slowly","Singing loudly"], a:0},
+  {q:"What does \"subsiding\" mean?", o:["Slowly becoming calmer or less strong","Suddenly exploding","Growing rapidly","Disappearing forever"], a:0},
+  {q:"What does \"mendicancy\" mean?", o:["A type of dance","The act of begging for money or food","A successful career","A loud sound"], a:1},
+  {q:"What does \"appertaining\" mean?", o:["Belonging to or related to something","Throwing something away","Singing in a choir","Running quickly"], a:0},
+  {q:"What does \"thereunto\" mean?", o:["A type of clothing","To that purpose or goal","A loud noise","A type of food"], o_alt:[], a:1},
+  {q:"What does \"vestibule\" mean?", o:["A type of musical instrument","A small entrance room before the main part of a building","A warm winter coat","A fast vehicle"], a:1},
+  {q:"What does the phrase \"beggar description\" mean?", o:["Describing someone who looks poor or dressed in worn clothing","A formal way to say goodbye","A loud and angry shout","A type of book cover"], a:0},
+  {q:"What does \"unassuming\" mean?", o:["Very showy and proud","Simple and not trying to show off","Extremely loud","Very angry"], a:1},
+  {q:"What does \"prosperity\" mean?", o:["The state of being successful or having enough money","A state of great sadness","A loud celebration","A type of weather"], a:0},
+  {q:"What does \"agile\" mean?", o:["Extremely heavy and slow","Able to move quickly and easily","Very loud and distracting","Sharp and dangerous"], a:1},
+  {q:"What does \"sterling\" mean?", o:["Cheap and low quality","Very valuable or excellent quality","Very loud and noisy","Strangely shaped"], a:1},
+  {q:"What does \"longitudinal\" mean?", o:["Running lengthwise from one end to the other","Running side to side","Going up and down","Curving in circles"], a:0},
+  {q:"What does \"pier-glass\" mean?", o:["A small drinking cup","A tall mirror placed on a wall to see a full reflection","A type of dock or pier","A warm blanket"], a:1},
+  {q:"What does \"whirled\" mean?", o:["Spun or turned around quickly","Stood completely still","Spoke very softly","Watched silently"], a:0},
+  {q:"What does \"depreciate\" mean?", o:["To gain value over time","To lose value over time","To clean carefully","To celebrate loudly"], a:1},
+  {q:"In storytelling, what does \"queen of Sheba\" describe?", o:["Someone very rich, beautiful, or impressive","A very poor person","A type of dessert","A type of dance"], a:0},
+  {q:"In storytelling, what does \"King Solomon\" describe?", o:["A child","Someone very wise or very rich","A clumsy person","A fast runner"], a:1},
+  {q:"What does \"cascade\" mean?", o:["Something falling like a waterfall","A slow and gentle breeze","A loud explosion","A small puddle"], a:0},
+  {q:"What does \"faltered\" mean?", o:["Hesitated or stopped because of uncertainty","Spoke with great confidence","Ran very quickly","Sang loudly"], a:0},
+  {q:"What does \"ransacking\" mean?", o:["Cleaning carefully","Searching everywhere in a messy way","Folding neatly","Watching quietly"], a:1},
+  {q:"What does \"chaste\" mean?", o:["Very fancy and decorated","Simple and not overly decorated","Extremely loud","Brightly colored"], a:1},
+  {q:"What does \"proclaim\" mean?", o:["To whisper quietly","To announce something publicly","To hide carefully","To clean thoroughly"], a:1},
+  {q:"What does \"meretricious\" mean?", o:["Truly beautiful and valuable","Looking fancy but actually cheap or fake","Extremely useful","Very simple and plain"], a:1},
+  {q:"What does \"ornamentation\" mean?", o:["Decorations added to make something look nicer","Loud noises in a song","Plain, undecorated surfaces","A type of food"], a:0},
+  {q:"What does the phrase \"on the sly\" mean?", o:["Out in the open for everyone to see","Secretly, without being noticed","Very loudly","Extremely quickly"], a:1},
+  {q:"What does the phrase \"on rosy wings\" mean?", o:["Spreading happily or hopefully","Falling sadly","Crashing loudly","Moving extremely slowly"], a:0},
+  {q:"What does \"fob chain\" mean?", o:["A short decorative chain attached to a pocket watch","A heavy iron lock","A type of necklace for swimming","A loud bell"], a:0},
+  {q:"What does \"intoxication\" mean?", o:["A strong feeling of excitement or happiness","A state of complete sadness","A type of math test","A quiet whisper"], a:0},
+  {q:"What does \"prudence\" mean?", o:["Reckless behavior","Being careful and wise in decisions","Loud singing","Fast running"], a:1},
+  {q:"What does \"ravages\" mean?", o:["Acts of kindness","Great damage or destruction","Soft melodies","Warm meals"], a:1},
+  {q:"What does \"truant\" mean?", o:["A teacher who works extra hours","Someone who skips school without permission","A student with the highest grades","A school nurse"], a:1},
+  {q:"What does \"sentiments\" mean?", o:["Feelings or emotions about something","Loud noises","Mathematical calculations","Physical objects"], a:0},
+  {q:"What does \"laboriously\" mean?", o:["Easily and quickly","Doing something with great effort and hard work","In a careless way","Without paying attention"], a:1},
+  {q:"What does \"patent\" (as an adjective) mean?", o:["Very clear and obvious","Hidden and secret","Extremely complicated","Brightly colored"], a:0},
+  {q:"What does \"discreet\" mean?", o:["Bold and attention-seeking","Careful not to draw attention or reveal secrets","Extremely loud","Very angry"], a:1},
+  {q:"What does \"scrutiny\" mean?", o:["A quick, careless glance","Very careful examination","A loud argument","A long nap"], a:1},
+  {q:"What does \"trance\" mean?", o:["A state of being lost in thought and unaware of surroundings","An angry outburst","A fast run","A short letter"], a:0},
+  {q:"What does \"inconsequential\" mean?", o:["Extremely important","Not important or having little effect","Very loud","Brightly colored"], a:1},
+  {q:"What does \"assertion\" mean?", o:["A quiet question","A strong statement that something is true","A type of song","A type of clothing"], a:1},
+  {q:"What does \"yearned\" mean?", o:["Strongly wished for something","Easily forgot about something","Carelessly threw away something","Loudly announced something"], a:0},
+  {q:"What does \"adorned\" mean?", o:["Hidden or buried","Decorated or made beautiful","Carelessly broken","Loudly criticized"], a:1},
+  {q:"What does \"coveted\" mean?", o:["Strongly wanted something someone else has","Easily gave away something","Forgot about something","Ignored completely"], a:0},
+  {q:"What does \"nimble\" mean?", o:["Heavy and clumsy","Quick and light in movement","Extremely loud","Very tired"], a:1},
+  {q:"What does \"singed\" mean?", o:["Slightly burned on the surface","Completely soaked in water","Brightly polished","Carefully folded"], a:0},
+  {q:"What does \"ardent\" mean?", o:["Cold and uninterested","Very passionate or enthusiastic","Extremely sleepy","Slightly annoyed"], a:1},
+  {q:"What does \"uneventful\" mean?", o:["Full of exciting surprises","Without anything exciting happening","Extremely dangerous","Very loud"], a:1},
+  {q:"What does \"chronicle\" mean?", o:["A written record of events over time","A loud cheer","A small drawing","A quick nap"], a:0},
+  {q:"What does \"profusely\" mean?", o:["In a small, quiet amount","In a very big amount; abundantly","Slowly and carefully","Rarely and reluctantly"], a:1},
+  {q:"What does \"boisterous\" mean?", o:["Quiet and shy","Loud, rowdy, and full of rough energy","Carefully organized","Very tired"], a:1},
+  {q:"What does \"surveying\" mean?", o:["Looking around carefully to check things out","Forgetting important details","Sleeping deeply","Singing softly"], a:0},
+  {q:"What does \"jovial\" mean?", o:["Sad and gloomy","Cheerful, happy, and friendly","Extremely tired","Very angry"], a:1},
+  {q:"What does \"scold\" (as a noun) mean?", o:["A kind, gentle person","A person who often nags or yells at others","A type of bird","A small tool"], a:1},
+  {q:"What does \"reprimand\" mean?", o:["A scolding or criticism from someone in charge","A kind compliment","A warm hug","A friendly invitation"], a:0},
+  {q:"What does \"paraphernalia\" mean?", o:["A single small object","Tools, items, or stuff needed for a certain activity","A type of musical instrument","A cold drink"], a:1},
+  {q:"What does \"preceded\" mean?", o:["Came after something","Came before something else in time or order","Stayed exactly even","Was forgotten completely"], a:1},
+  {q:"What does \"splintered\" mean?", o:["Polished and shining","Broken into sharp, thin pieces","Perfectly smooth","Completely missing"], a:1},
+  {q:"What does \"securely\" mean?", o:["Loosely and shakily","Firmly and safely, so it won't move or fall","Extremely quickly","Very loudly"], a:1},
+  {q:"What does \"perfunctory\" mean?", o:["Done with great care and detail","Done quickly and without much care, just as a habit","Done with excitement","Done very slowly"], a:1},
+  {q:"What does \"lapse\" (verb) mean?", o:["To slowly stop happening or be forgotten over time","To speed up rapidly","To grow stronger","To shine brightly"], a:0},
+  {q:"What does \"interminably\" mean?", o:["For a very short time","For a very long time that feels like it never ends","Suddenly and quickly","Very quietly"], a:1},
+  {q:"What does \"craned\" mean?", o:["Stretched the neck to try to see better","Sat down comfortably","Whispered softly","Folded neatly"], a:0},
+  {q:"What does \"petulantly\" mean?", o:["In a grumpy, whiny, childish way","In a calm, mature way","With great confidence","Very quietly"], a:0},
+  {q:"What does \"longing\" mean?", o:["A strong desire or wish","A quick action","A loud sound","A simple meal"], a:0},
+  {q:"What does \"souls\" mean (in poetic use)?", o:["The inner essence or spirit of people","Small flat fish","Pieces of a shoe","Loud cheers"], a:0},
+  {q:"What does \"dwell\" mean?", o:["To live or exist in a place","To run away quickly","To shout loudly","To break apart"], a:0},
+  {q:"What does \"strive\" mean?", o:["To make great effort","To rest peacefully","To forget completely","To celebrate noisily"], a:0},
+  {q:"What does \"infinite\" mean?", o:["Endless or boundless","Very small and limited","Cheaply made","Loud and harsh"], a:0},
+  {q:"What does \"archer\" mean (used symbolically)?", o:["A type of bridge","A higher power or life force that guides destiny","A small singing bird","A loud bell"], a:1},
+  {q:"What does \"apparel\" mean?", o:["A type of food","Clothing, garments","A loud bell","A fast vehicle"], a:1},
+  {q:"What does \"besiege\" mean?", o:["To help quietly","To surround or overwhelm","To run away","To sing softly"], a:1},
+  {q:"What does \"compress\" (verb) mean?", o:["To press together; reduce in size","To make a sound louder","To throw away","To enlarge greatly"], a:0},
+  {q:"What does \"compress\" (noun) mean?", o:["A warm winter coat","A pad of cloth applied to an injury","A loud noise","A fast car"], a:1},
+  {q:"What does \"denounce\" mean?", o:["To condemn openly; to accuse formally","To praise loudly","To hide carefully","To run quickly"], a:0},
+  {q:"What does \"dispatch\" (verb) mean?", o:["To send off for a purpose or deal with quickly","To watch quietly","To keep forever","To sing softly"], a:0},
+  {q:"What does \"dispatch\" (noun) mean?", o:["A message sent with speed","A slow letter","A warm meal","An angry shout"], a:0},
+  {q:"What does \"douse\" mean?", o:["To light a fire","To plunge into liquid or extinguish a fire","To celebrate loudly","To run quickly"], a:1},
+  {q:"What does \"expressly\" mean?", o:["In a confused way","Clearly stated or for a specific purpose","Very slowly","Very quietly"], a:1},
+  {q:"What does \"famished\" mean?", o:["Feeling extremely full","Suffering severely from hunger","Feeling joyful","Feeling sleepy"], a:1},
+  {q:"What does \"forsake\" mean?", o:["To hold onto forever","To give up, renounce, or abandon","To run quickly","To sing loudly"], a:1},
+  {q:"What does \"gainful\" mean?", o:["Useless and wasteful","Profitable; providing an advantage","Extremely heavy","Very loud"], a:1},
+  {q:"What does \"immense\" mean?", o:["Very large or great; huge","Small and delicate","Sharp and pointed","Medium-sized"], a:0},
+  {q:"What does \"inept\" mean?", o:["Very skilled","Without skill; clumsy","Extremely fast","Very loud"], a:1},
+  {q:"What does \"ingenious\" mean?", o:["Remarkably clever or original","Very foolish","Extremely heavy","Very slow"], a:0},
+  {q:"What does \"instantaneous\" mean?", o:["Happening in an instant","Taking many hours","Very loud","Extremely heavy"], a:0},
+  {q:"What does \"irk\" mean?", o:["To make happy","To run quickly","To annoy or irritate","To sing loudly"], a:2},
+  {q:"What does \"libel\" (noun) mean?", o:["A false written statement that harms a reputation","A kind compliment","A fast message","A warm meal"], a:0},
+  {q:"What does \"libel\" (verb) mean?", o:["To publish a false statement that harms someone","To speak politely","To write the truth","To run away"], a:0},
+  {q:"What does \"misgiving\" mean?", o:["Complete confidence","A feeling of doubt or fear","Extreme happiness","Sudden excitement"], a:1},
+  {q:"What does \"oaf\" mean?", o:["A clumsy, stupid person","A clever expert","A fast runner","A quiet reader"], a:0},
+  {q:"What does \"recede\" mean?", o:["To move forward quickly","To move back or away","To celebrate","To sing loudly"], a:1},
+  {q:"What does \"repast\" mean?", o:["A fast race","A meal; food served at a meal","A loud noise","A winter coat"], a:1},
+  {q:"What does \"abyss\" mean?", o:["A small puddle","A deep, seemingly bottomless hole or chasm","A short song","A small village"], a:1},
+  {q:"What does \"befall\" mean?", o:["To happen to someone (often something bad)","To gently lift up","To loudly cheer","To carefully measure"], a:0},
+  {q:"What does \"crucial\" mean?", o:["Extremely important","Mildly amusing","Quietly hidden","Brightly colored"], a:0},
+  {q:"What does \"dregs\" mean?", o:["The very top, best layer","The last, worst part or sediment left behind","A bright light","A small bird"], a:1},
+  {q:"What does \"embody\" mean?", o:["To represent or be a perfect example of something","To forget completely","To run away from","To loudly criticize"], a:0},
+  {q:"What does \"exasperate\" mean?", o:["To make calm and relaxed","To greatly annoy or frustrate","To politely thank","To gently encourage"], a:1},
+  {q:"What does \"fiasco\" mean?", o:["A complete and embarrassing failure","A huge success","A peaceful moment","A small snack"], a:0},
+  {q:"What does \"garnish\" mean?", o:["To decorate (especially food) to make it look better","To eat very quickly","To clean carefully","To sing in a choir"], a:0},
+  {q:"What does \"heritage\" mean?", o:["Traditions, history, and culture passed down","A loud celebration","A type of vehicle","A short test"], a:0},
+  {q:"What does \"inert\" mean?", o:["Motionless; not active","Extremely fast","Very loud","Brightly glowing"], a:0},
+  {q:"What does \"mercenary\" mean?", o:["Motivated mainly by money or personal gain","Acting out of pure kindness","Very shy and quiet","Extremely artistic"], a:0},
+  {q:"What does \"negligent\" mean?", o:["Careless; failing to take proper care","Extremely careful","Highly skilled","Very generous"], a:0},
+  {q:"What does \"oblivion\" mean?", o:["A state of being forgotten or unaware","A famous celebration","A sharp tool","A type of music"], a:0},
+  {q:"What does \"opus\" mean?", o:["A major artistic work, especially in music","A small mistake","A quick meal","A type of dance"], a:0},
+  {q:"What does \"pallid\" mean?", o:["Bright and colorful","Pale, lacking color, especially of the face","Loud and busy","Tall and strong"], a:1},
+  {q:"What does \"parable\" mean?", o:["A short story that teaches a lesson","A loud argument","A long math problem","A type of musical instrument"], a:0},
+  {q:"What does \"rational\" mean?", o:["Based on reason or logic","Based on wild emotions","Random and chaotic","Brightly colored"], a:0},
+  {q:"What does \"reciprocal\" mean?", o:["Given, felt, or done in return","Only one-sided","Extremely loud","Brand new"], a:0},
+  {q:"What does \"stricture\" mean?", o:["A severe criticism or restriction","A gentle compliment","A fast vehicle","A warm hug"], a:0},
+  {q:"What does \"veneer\" mean?", o:["A thin decorative covering hiding what's underneath","A loud, sudden noise","A type of food","A fast horse"], a:0}
+];
+
+const LETTERS = ["A","B","C","D"];
+const answered = new Array(QUESTIONS.length).fill(false);
+let correctCount = 0;
+let wrongCount = 0;
+
+function renderQuiz() {
+  const root = document.getElementById("quiz");
+  root.innerHTML = "";
+  QUESTIONS.forEach((item, i) => {
+    const card = document.createElement("div");
+    card.className = "question";
+
+    const qtext = document.createElement("div");
+    qtext.className = "qtext";
+    qtext.innerHTML = `<span class="qnum">${i+1}.</span>${escapeHtml(item.q)}`;
+    card.appendChild(qtext);
+
+    const opts = document.createElement("div");
+    opts.className = "options";
+    item.o.forEach((text, j) => {
+      const btn = document.createElement("button");
+      btn.className = "opt";
+      btn.innerHTML = `<span class="letter">${LETTERS[j]}</span>${escapeHtml(text)}`;
+      btn.onclick = () => handleClick(i, j, opts, fb);
+      opts.appendChild(btn);
+    });
+    card.appendChild(opts);
+
+    const fb = document.createElement("div");
+    fb.className = "feedback";
+    card.appendChild(fb);
+
+    root.appendChild(card);
+  });
+  document.getElementById("total").textContent = QUESTIONS.length;
+  updateScore();
+}
+
+function handleClick(qi, oi, optsEl, fbEl) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+  const correct = QUESTIONS[qi].a;
+  const buttons = optsEl.querySelectorAll("button");
+  buttons.forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === correct) b.classList.add("correct");
+    if (idx === oi && oi !== correct) b.classList.add("incorrect");
+  });
+  if (oi === correct) {
+    correctCount++;
+    fbEl.className = "feedback show right";
+    fbEl.textContent = "Correct!";
+  } else {
+    wrongCount++;
+    fbEl.className = "feedback show wrong";
+    fbEl.textContent = `Incorrect. The correct answer is ${LETTERS[correct]}.`;
+  }
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById("correctCount").textContent = correctCount;
+  document.getElementById("wrongCount").textContent = wrongCount;
+  document.getElementById("answered").textContent = answered.filter(Boolean).length;
+}
+
+function resetQuiz() {
+  for (let i = 0; i < answered.length; i++) answered[i] = false;
+  correctCount = 0;
+  wrongCount = 0;
+  renderQuiz();
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
